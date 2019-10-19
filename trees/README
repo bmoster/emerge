@@ -1,0 +1,11 @@
+Dark matter halo merger trees extracted from a simulation with 100 Mpc side length can be downloaded here:
+
+http://www.usm.lmu.de/emerge
+
+These trees have the following parameters:
+HubbleParam         0.6781
+Omega0              0.3080
+OmegaLambda         0.6920
+OmegaBaryon         0.0484
+BoxSize             67.81
+

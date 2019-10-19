@@ -1,0 +1,111 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                                                                          %
+% Parameter file for the EMERGE code                                                                                       %
+%                                                                                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% General Setup
+
+ModelName           P100                        % Name for the Model that will be used for the output directory
+UniversesInParallel 1                           % Number of Universes that will be computed in parallel (e.g. for MCMC)
+NumFilesInParallel  4                           % Number of file read/written in parallel
+Verbose             1                           % Flag that defines how verbose the screen output is (1: little, 4: all)
+MaxMemSize          1500                        % Size of maximum memory consumption in MB
+BufferSize          100                         % Size of communication buffer in MB
+
+
+%  Relevant files
+
+TreefileName        trees/P100                  % Input tree file
+SMFfileName         data/smf.dat                % Observed stellar mass functions
+FQfileName          data/fq.dat                 % Observed quenched fractions
+CSFRDfileName       data/csfrd.dat              % Observed cosmic star formation rate density
+SSFRfileName        data/ssfr.dat               % Observed specific star formation rates
+WPfileName          data/wp.dat                 % Observed projected correlation functions
+
+
+%Cosmology
+
+HubbleParam         0.6781                      % Hubble Parameter
+Omega0              0.3080                      % Matter density
+OmegaLambda         0.6920                      % Dark Energy density
+OmegaBaryon         0.0484                      % Baryonic Density
+
+
+% Simulation Parameters
+
+BoxSize             67.81                       % Same units as the tree file.
+
+
+% Units
+
+UnitLength_in_Mpc   1.0                         % Length unit in Mpc
+UnitTime_in_yr      1.0e9                       % Time unit in yr (use 1e9 for Gyr)
+UnitMass_in_Msun    1.0e9                       % Mass unit in Msun
+
+
+% SF Efficiency Parameters
+
+Eff_MassPeak           11.34829                 % Halo mass of the peak SF efficiency
+Eff_Normalisation      0.009010                 % Normalization of the SFE
+Eff_LowMassSlope       3.094621                 % Low Mass slope of the SFE
+Eff_HighMassSlope      1.107304                 % High Mass slope of the SFE
+Eff_MassPeak_Z         0.654238                 % Redshift Evolution of the Halo mass of the peak SF efficiency
+Eff_Normalisation_Z    0.596666                 % Redshift Evolution of the Normalization of the SFE
+Eff_LowMassSlope_Z    -2.019841                 % Redshift Evolution of the Low Mass slope of the SFE
+
+
+% Satellite galaxy parameters
+
+Fraction_Escape_ICM    0.562183                 % Fraction of the stellar mass of a satellite that goes to the ICM when merging with the central
+Fraction_Stripping     0.004015                 % Fraction of the peak halo mass that has to be reach to completely strip the stellar mass to the ICM
+Timescale_Quenching    4.461039                 % Fraction of the dynamical time (at peak mass) when the SFR is quenched
+Slope_Quenching        0.346817                 % Slope of the power law relation between quenching timescale and stellar mass
+
+
+% Adjustable parameters
+
+Mstar_min              7.00                     % Minimum stellar mass for the stellar mass array used for the statistics (SMFs, FQs, SSFRs)
+Mstar_max             12.50                     % Maximum stellar mass for the stellar mass array used for the statistics (SMFs, FQs, SSFRs)
+Delta_Mstar            0.20                     % Bin size for the stellar mass array
+Observation_Error_0    0.08                     % Scatter between true and observed stellar mass at z=0
+Observation_Error_z    0.06                     % Evolution of scatter between true and observed stellar mass
+Global_Sigma_SMF_LZ    0.15                     % Global error of the SMF at low redshift (in dex)
+Global_Sigma_SMF_HZ    0.30                     % Global error of the SMF at high redshift (in dex)
+Global_Sigma_FQ        0.10                     % Global error of the quenched fractions (absolute)
+Global_Sigma_CSFRD     0.10                     % Global error of the CSFRD (in dex)
+Global_Sigma_SSFR      0.15                     % Global error of the SSFR (in dex)
+Global_Sigma_WP        0.40                     % Global error of the WP (in percent)
+
+
+% Fitting parameters
+
+Eff_MassPeak_Range          0.200               % Range of Halo mass of the peak SF efficiency
+Eff_Normalisation_Range     0.500               % Range of log10 Normalization of the SFE
+Eff_LowMassSlope_Range      0.500               % Range of Low Mass slope of the SFE
+Eff_HighMassSlope_Range     0.200               % Range of High Mass slope of the SFE
+Eff_MassPeak_Z_Range        0.200               % Range of Redshift Evolution of the Halo mass of the peak SF efficiency
+Eff_Normalisation_Z_Range   0.200               % Range of Redshift Evolution of the Normalization of the SFE
+Eff_LowMassSlope_Z_Range    0.500               % Range of Redshift Evolution of the Low Mass slope of the SFE
+Fraction_Escape_ICM_Range   0.300               % Range of log10 Fraction of the stellar mass of a satellite that goes to the ICM when merging with the central
+Fraction_Stripping_Range    0.300               % Range of log10 Fraction of the peak halo mass that has to be reach to completely strip the stellar mass to the ICM
+Timescale_Quenching_Range   0.500               % Range of log10 Fraction of the dynamical time (at peak mass) when the SFR is quenched
+Slope_Quenching_Range       0.400               % Range of slope of the power law relation between quenching timescale and stellar mass
+
+
+% MCMC parameters
+
+NumberOfMCMCWalkers         8                   % Number of Walkers for the ensemble MCMC (go large!)
+MCMCScaleParameter          2.0                 % Scale parameter of the MCMC, can be adjusted to get good acceptance fractions
+ChainTemperature            100.0               % Temperature of the MCMC/HYBRID chains (Positive: T decreases with step number, Negative: constant T)
+TimeLimit                   180.0               % Time limit in seconds - code is stopped before this limit
+MCMCseed                    12345               % Seed for the random numbers used in the MCMC
+
+
+% Output parameters
+
+NumOutputFiles              1                   % Number of Output files that will be written
+OutputFormat                1                   % Format of the output files (1: ascii, 2: HDF5)
+OutputRedshifts             0.1,0.5,1.0         % String of comma-separated-values (no spaces) that set the redshifts at which the galaxy catalogue will be printed
+OutputMassThreshold         7.0                 % Sets the minimum mass of galaxies that will be printed (in log10 Msun)

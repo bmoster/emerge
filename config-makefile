@@ -1,0 +1,6 @@
+RESULT     := $(shell mkdir -p $(BUILD_DIR)  )
+
+all: $(BUILD_DIR)/codeoptions.h 
+
+$(BUILD_DIR)/codeoptions.h:  $(CONFIG)
+	$(PERL) compile-config.perl $(CONFIG) $(BUILD_DIR)
