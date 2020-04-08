@@ -36,7 +36,7 @@
 
 #define CODE      "EMERGE"             ///< Code name
 #define BRANCH    "master"             ///< Branch name
-#define VERSION   "1.0.0"              ///< Code version
+#define VERSION   "1.0.1"              ///< Code version
 #define SYMBOL    '#'                  ///< Symbol used to start output lines
 
 #define NSTRING              200       ///< Number of elements used for a generic string

@@ -698,7 +698,7 @@ float get_tdf(int ihalo, int imain)
 	dx   = NEAREST(H[ihalo].pos[0]-H[imain].pos[0]);
 	dy   = NEAREST(H[ihalo].pos[1]-H[imain].pos[1]);
 	dz   = NEAREST(H[ihalo].pos[2]-H[imain].pos[2]);
-	rsat = sqrt(dx*dx+dy*dy+dz*dz);
+	rsat = sqrt(dx*dx+dy*dy+dz*dz)*H[imain].a;
 	clog = log(1.0+(H[imain].mvir+H[imain].mstar)/(H[ihalo].mvir+H[ihalo].mstar));
 	mu   = (H[ihalo].mvir+H[ihalo].mstar)/(H[imain].mvir+H[imain].mstar);
 	tau  = (H[imain].rvir*All.x_unit/vvir) * MPC_IN_KM / YR_IN_SEC / All.t_unit;

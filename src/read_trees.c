@@ -732,7 +732,7 @@ void empty_read_buffer(int offset, int hc)
 
 		H[offset + n].a      = h[n].a;
 		H[offset + n].mvir   = h[n].mvir/All.h_100/All.m_unit;;
-		H[offset + n].rvir   = h[n].rvir/All.h_100/All.x_unit/1000.0;
+		H[offset + n].rvir   = h[n].rvir/All.h_100/All.x_unit/1000.0*h[n].a;
 		H[offset + n].c      = h[n].c;
 		H[offset + n].lambda = h[n].lambda;
 

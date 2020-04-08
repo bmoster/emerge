@@ -45,7 +45,7 @@ void read_parameterfile(char *fname)
 #define MAXTAGS 300    ///< Maximum number of entries the parameter file can contain
 
 	FILE *fd;
-	char buf[200], buf1[200], buf2[200], buf3[200];
+	char buf[NSTRING], buf1[NSTRING], buf2[NSTRING], buf3[NSTRING];
 	int i, j, nt;
 	int id[MAXTAGS];
 	void *addr[MAXTAGS];
@@ -534,7 +534,7 @@ void read_parameterfile(char *fname)
 void setup(void){
 
 	int i;
-	char buf[500], tmp1[NSTRING], *tmp2;
+	char buf[NSTRING], tmp1[NSTRING], *tmp2;
 
 	//Print a line
 	if (ThisTask == 0) printf("%s\n",All.fullline);
@@ -653,6 +653,27 @@ void setup(void){
 		{
 			if (All.verbose >= VERBOSE_MIN) printf("%s Creating output directory '%s'\n",All.startline,All.OutputDir);
 		}
+#ifdef WRITE_GALAXY_CATALOG
+		sprintf(buf, "%s/galaxies", All.OutputDir);
+		if (mkdir(buf, 02755) == 0)
+		{
+			if (All.verbose >= VERBOSE_MIN) printf("%s Creating galaxy catalogue directory '%s'\n",All.startline,buf);
+		}
+#endif
+#ifdef WRITE_HALO_CATALOG
+		sprintf(buf, "%s/haloes", All.OutputDir);
+		if (mkdir(buf, 02755) == 0)
+		{
+			if (All.verbose >= VERBOSE_MIN) printf("%s Creating halo catalogue directory '%s'\n",All.startline,buf);
+		}
+#endif
+#ifdef WRITE_MAINBRANCH
+		sprintf(buf, "%s/mainbranches", All.OutputDir);
+		if (mkdir(buf, 02755) == 0)
+		{
+			if (All.verbose >= VERBOSE_MIN) printf("%s Creating mainbranch directory '%s'\n",All.startline,buf);
+		}
+#endif
 	}
 
 	//Open all log files

@@ -1040,7 +1040,7 @@ the redshift for all correlation functions must be the same (given at the start 
 ## 6)  Halo merger tree files
 
 In addition to observed galaxy data, Emerge relies on simulated dark matter halo merger trees that will be populated with galaxies. The
-files that containt these merger trees and their locations can be specified in the parameter file with the parameter `TreefileName`. The
+files that contain these merger trees and their locations can be specified in the parameter file with the parameter `TreefileName`. The
 suggested location for the merger tree files is the `trees` folder. If the trees are located in a single file, `TreefileName` corresponds
 to the name of this file including folder, e.g. `trees/P100`. If the trees are stored within multiple files, `TreefileName` gives the file
 base name, which will be appended with the file index, e.g. `trees/P100` corresponds to the files `P100.0`, `P100.1`, `P100.2`, `...`,
