@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 #include <mpi.h>
+#include <gsl/gsl_integration.h>
 #include <gsl/gsl_rng.h>
 #include "allvars.h"
 #include "proto.h"
@@ -731,7 +732,7 @@ void empty_read_buffer(int offset, int hc)
 		H[offset + n].mmp    = h[n].mmp;
 
 		H[offset + n].a      = h[n].a;
-		H[offset + n].mvir   = h[n].mvir/All.h_100/All.m_unit;;
+		H[offset + n].mvir   = h[n].mvir/All.h_100/All.m_unit;
 		H[offset + n].rvir   = h[n].rvir/All.h_100/All.x_unit/1000.0*h[n].a;
 		H[offset + n].c      = h[n].c;
 		H[offset + n].lambda = h[n].lambda;
@@ -1471,7 +1472,11 @@ void sort_by_size(void)
 	//And increment the number of forests one last time
 	iforest++;
 
-	if (iforest != Nforests) endrun("The number of forests after sorting is not the same as the stored number");
+	if (iforest != Nforests)
+	{
+		printf("%d %d %d\n",ThisTask,iforest,Nforests);
+		endrun("The number of forests after sorting is not the same as the stored number");
+	}
 #endif
 
 	//Finally restore all the values that have been used for the sorting (icoprog, idescgal and possibly imass)
@@ -1897,9 +1902,13 @@ void distribute_trees(int ntask, double load)
 void get_timesteps(void)
 {
 
-	int i, j, nTimesteps, maxnTimesteps;
+	int i, j, m, nTimesteps, maxnTimesteps;
+	float t0, t1, ml;
 	float *a, *alist, *alistall;
+	double *xxx, *www;
 	char buf[500];
+	gsl_integration_fixed_workspace *w;
+	const gsl_integration_fixed_type *T = gsl_integration_fixed_legendre;
 
 	//Print what is done...
 	if (ThisTask == 0) printf("%s\n%s Identifying the number of timesteps and the list of scale factors from the trees...\n", All.fullline,All.startline);
@@ -2066,22 +2075,57 @@ void get_timesteps(void)
 	}
 #endif
 
-	//Compute the MassLeft table which stores the fraction of mass left after any time interval
-	MassLeft = emalloc_movable(&MassLeft,"MassLeft", All.NTimesteps * All.NTimesteps * sizeof(float));
+	//Compute the population age table which stores the age of each stellar population
+	PopAge = emalloc_movable(&PopAge, "PopAge", All.NTimesteps * All.NTimesteps * sizeof(float));
 	for (i = 0; i < All.NTimesteps; i++)
-	{
-		for (j = 0; j < All.NTimesteps; j++)
-		{
-			if (j < i) MassLeft[i*All.NTimesteps+j] = 1.0 - 0.05 * log( ((CosmicTime[i]-CosmicTime[j])*All.t_unit/1.4e6) + 1.0);
-			else MassLeft[i*All.NTimesteps+j] = 1.0;
+	{      //The age at the first snapshot is the age of the Universe
+		PopAge[i*All.NTimesteps] = log10(CosmicTime[i]*All.t_unit);
+		for (j = 1; j < All.NTimesteps; j++)
+		{            //For each other snapshot, the population age is the time since the previous snapshot
+			if (j <= i) PopAge[i*All.NTimesteps+j] = log10((CosmicTime[i]-CosmicTime[j-1])*All.t_unit);
+			else PopAge[i*All.NTimesteps+j] = 0.0;
 		}
 	}
+
+	//Compute the MassLeft table which stores the fraction of mass left after any time interval
+	MassLeft = emalloc_movable(&MassLeft,"MassLeft", All.NTimesteps * All.NTimesteps * sizeof(float));
+	//Go through all timesteps
+	for (i = 0; i < All.NTimesteps; i++)
+	{ //Go through all populations for this timestep
+		for (j = 0; j < All.NTimesteps; j++)
+		{ //If the population forms after or at this snapshot set t0 to 0, otherwise to the next snapshot (lower bound for age)
+			if (i <= j) t0 = 0.0;
+			else t0 = pow(10.0,PopAge[i*All.NTimesteps+j+1])/All.t_unit;
+			//Set t1 to the current population age (upper bound for age)
+			t1 = pow(10.0,PopAge[i*All.NTimesteps+j])/All.t_unit;
+			//If population forms before or at this snapshot
+			if (i >= j)
+			{ //Allocate the integration workspace and link the quadrature nodes and weights
+				w = gsl_integration_fixed_alloc(T, NINTQUAD, t0, t1, 0.0, 0.0);
+				xxx = gsl_integration_fixed_nodes(w);
+				www = gsl_integration_fixed_weights(w);
+				//Set initial fraction of mass left to 0
+				ml = 0.0;
+				//Integrate over the quadrature nodes by multiplying the weights and f_left and summing it up
+				for (m = 0; m < NINTQUAD; m++) ml += www[m] * (1.0 - 0.05 * log( (xxx[m]*All.t_unit/1.4e6) + 1.0));
+				//Divide by the timestep width and write the result into the MassLeft array
+				MassLeft[i*All.NTimesteps+j] = ml / (t1 - t0);
+				//Free the integration workspace
+				gsl_integration_fixed_free(w);
+			}
+			else
+			{ //Otherwise set the fraction of stars left to 1 (will never be used though)
+				MassLeft[i*All.NTimesteps+j] = 1.0;
+			}
+		}//End j
+	}//End i
 
 	//Broadcast so that every universe has the joy
 	MPI_Bcast(ScaleFactor,     All.NTimesteps, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(CosmicTime,      All.NTimesteps, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(Timestep,        All.NTimesteps, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(DynTime,         All.NTimesteps, MPI_FLOAT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(PopAge,          All.NTimesteps * All.NTimesteps, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(MassLeft,        All.NTimesteps * All.NTimesteps, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(Output_iscale,   All.Noutputredshifts, MPI_INT, 0, MPI_COMM_WORLD);
 	MPI_Bcast(OutputRedshifts, All.Noutputredshifts, MPI_FLOAT, 0, MPI_COMM_WORLD);
@@ -2224,7 +2268,6 @@ void add_orphans(void)
 				else H[iorphan].descid = maxid+2;
 				//We now use the upid of the orphan to record the true descendants halo ID
 				H[iorphan].upid     = H[idesc].haloid;
-
 				//Copy all relevant information from the true descendant
 				H[iorphan].iscale   = H[idesc].iscale;
 				H[iorphan].type     = 2; //All orphans are type 2
@@ -2526,7 +2569,7 @@ void compute_halo_history(void)
 	//Go through all haloes
 	for (ihalo = 0; ihalo < Nhalos; ihalo++)
 	{
-		//If this halo does not have any progenitors set its iprog to -1 and its impeak to this halo's index
+		//If this halo does not have any progenitors set its impeak to this halo's index
 		if (H[ihalo].np < 1) H[ihalo].impeak = ihalo;
 		//Copy the index of the peak halo mass from the progenitor
 		else H[ihalo].impeak = H[H[ihalo].iprog].impeak;

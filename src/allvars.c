@@ -51,6 +51,7 @@ float *CosmicTime;          // Cosmic time corresponding to the above scale fact
 float *Timestep;            // Timesteps corresponding the above scale factors
 float *DynTime;             // Dynamical halo times corresponding the above scale factors
 
+float *PopAge;              // Age of a stellar population
 float *MassLeft;            // Stores the fraction of the mass left between each scale factor
 float *MassFormed;          // Stores the mass of all populations ever formed in a branch
 float *ICMFormed;           // Stores the mass of all populations in the ICM

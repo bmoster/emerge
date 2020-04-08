@@ -803,6 +803,7 @@ void setup(void){
 void finalize (void)
 {
 	efree_movable(MassLeft);
+	efree_movable(PopAge);
 	efree_movable(DynTime);
 	efree_movable(Timestep);
 	efree_movable(CosmicTime);

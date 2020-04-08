@@ -36,13 +36,14 @@
 
 #define CODE      "EMERGE"             ///< Code name
 #define BRANCH    "master"             ///< Branch name
-#define VERSION   "1.0.1"              ///< Code version
+#define VERSION   "1.0.2"              ///< Code version
 #define SYMBOL    '#'                  ///< Symbol used to start output lines
 
 #define NSTRING              200       ///< Number of elements used for a generic string
 #define SSTRING               50       ///< Number of elements used for a short string
 #define LINESIZE             100       ///< Number of characters used for the screen output
 #define ALLOC_TOLERANCE      0.2       ///< Tolerance in the memory allocation
+#define NINTQUAD              16       ///< Number of integration nodes for gaussian quadrature
 
 #define ZMAX_SMFERR          4.0       ///< Maximum redshift up to which the observed stellar mass error increases
 #define SSFRTHRESH           0.3       ///< Fraction of the inverse Hubble time used for the SSFR threshold
@@ -542,6 +543,7 @@ extern float *CosmicTime;          ///< Cosmic time corresponding to the above s
 extern float *Timestep;            ///< Timesteps corresponding the above scale factors
 extern float *DynTime;             ///< Dynamical halo times corresponding the above scale factors
 
+extern float *PopAge;              ///< Age of a stellar population
 extern float *MassLeft;            ///< Stores the fraction of the mass left between each scale factor
 extern float *MassFormed;          ///< Stores the mass of all populations ever formed in a branch
 extern float *ICMFormed;           ///< Stores the mass of all populations in the ICM

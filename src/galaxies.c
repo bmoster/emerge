@@ -46,6 +46,9 @@ void init_galaxies(void)
 	int iforest;
 #endif
 
+	//Print what is done...
+	if (ThisTask == 0) printf("%s\n%s Populating dark matter haloes with galaxies...\n", All.fullline,All.startline);
+
 	//First find the maximum number of leaves
 #ifndef COMPUTE_ICM
 	//Loop through all trees
